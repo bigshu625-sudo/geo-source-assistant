@@ -137,3 +137,9 @@ To save supported video or gallery files, select **本次同时保存视频／�
 The project's `data/` directory holds tasks, screenshots, and media. Use **任务记录** (Task history) to switch tasks or rename them. Use **管理／清理记录** (Manage / clean records) to move a task to the trash. You can restore it there or delete it permanently to free space. Manage previously exported files separately in Chrome's downloads directory.
 
 See the [architecture guide](docs/ARCHITECTURE.md#english) for development, component boundaries, and packaging.
+
+## 许可证 / License
+
+本项目采用 [MIT 许可证](LICENSE)，允许使用、修改、分发和商用。分发软件副本或其中实质性部分时，须保留版权声明和许可声明。
+
+This project is released under the [MIT License](LICENSE). Keep the copyright and permission notices in copies or substantial portions of the software.

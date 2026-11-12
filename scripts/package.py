@@ -59,7 +59,9 @@ def main():
     OUTPUT.mkdir(exist_ok=True)
     extension = {p.relative_to(ROOT / 'extension').as_posix(): p
                  for p in (ROOT / 'extension').rglob('*') if p.is_file() and not p.is_symlink()}
+    license_file = ROOT / 'LICENSE'
     runtime = {'extension/' + name: path for name, path in extension.items()}
+    runtime['LICENSE'] = license_file
     # Runtime allowlist excludes data, credentials, diagnostics and development tools.
     for name in ['server/app.py', 'server/launcher.py', 'server/export_folder.py',
                  'server/requirements.txt', 'server/requirements-lock.txt',
@@ -77,7 +79,7 @@ def main():
                  'tests/server_test.py', 'tests/release_test.py']:
         source[name] = ROOT / name
     results = [
-        build_archive(OUTPUT / f'{TOP}-Chrome插件.zip', extension),
+        build_archive(OUTPUT / f'{TOP}-Chrome插件.zip', {**extension, 'LICENSE': license_file}),
         build_archive(OUTPUT / f'{TOP}-跨平台运行包.zip', runtime, TOP + '/'),
         build_archive(OUTPUT / f'{TOP}-GitHub源码.zip', source),
     ]
