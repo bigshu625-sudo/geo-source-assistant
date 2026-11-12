@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>体系致胜GEO-信源助手</title><link rel="stylesheet" href="panel.css"></head>
+<body>
+<header class="app-header">
+ <div class="brand">
+  <span class="logo" aria-hidden="true">AI</span>
+  <div><span class="brand-owner">体系致胜 GEO</span><strong>信源分析助手</strong></div>
+ </div>
+ <div class="header-actions">
+  <button id="settingsToggle" aria-controls="settings" aria-expanded="false">设置</button>
+  <span id="health" class="connection-state" role="status">本机未连接</span>
+ </div>
+</header>
+<div class="panel-top">
+ <div class="row screenshot-toolbar">
+  <div class="task-summary">
+   <span class="task-caption">当前任务</span>
+   <span id="screenshotTask">暂无任务</span>
+  </div>
+  <button id="downloadScreenshots" class="primary" aria-describedby="screenshotTask" disabled>下载截图</button>
+ </div>
+ <div id="notice" role="status" aria-live="polite" hidden></div>
+</div>
+<section id="capturePermission" class="capture-permission" hidden aria-label="截图权限说明"><h2>启用网页截图（可选）</h2><p>Chrome 的截图接口需要额外权限。下面的按钮会向 Chrome 申请“访问所有网站”，授权将允许本扩展读取和修改各网站页面的数据。截图功能只处理你主动选择的八个 AI 平台提问与回答，图片保存在本机。</p><p>可以拒绝并继续导入、导出信源；也可在 Chrome 扩展详情中收回权限。</p><button id="grantCapture" class="primary">启用截图权限并重试</button></section>
+<section id="settings" hidden>
+ <h2>本机连接</h2><label>连接码<input id="token" type="password" autocomplete="off" placeholder="从 pairing-token.txt 复制"></label><button id="connect">保存并连接</button><p id="connection" class="muted">运行“启动服务”脚本后连接。</p>
+ <h2>资料文件夹</h2>
+ <p id="savePath" class="muted"></p>
+ <button id="openLibraryFolder" disabled>打开本机资料库</button>
+ <label>自定义导出目录<input id="exportFolderPath" type="text" spellcheck="false" maxlength="4096" placeholder="选择文件夹，或填写完整路径" disabled></label>
+ <div class="folder-actions">
+  <button id="chooseExportFolder" disabled>选择文件夹</button>
+  <button id="saveExportFolder" disabled>保存路径</button>
+ </div>
+ <p id="folderSettingsStatus" class="muted folder-feedback" role="status" hidden></p>
+ <p class="muted">问答、信源和截图会留在本机资料库。只有点击导出或保存截图时，才会在所选位置另存文件。</p>
+ <p id="folderHelp" class="muted" hidden>如无法选择文件夹，请先重启新版的本机服务。</p>
+</section>
+<main>
+ <section class="panel-card platforms" aria-labelledby="platformHeading">
+  <h2 id="platformHeading">AI 平台</h2>
+  <nav class="platform-nav" aria-label="六个平台快捷入口">
+   <a class="platform-link" href="https://www.doubao.com/chat/" target="_blank" rel="noopener noreferrer" title="打开豆包"><img src="assets/platform-doubao.svg" alt="" width="23" height="23"><span>豆包</span></a>
+   <a class="platform-link" href="https://chat.deepseek.com/" target="_blank" rel="noopener noreferrer" title="打开 DeepSeek"><img src="assets/platform-deepseek.svg" alt="" width="23" height="23"><span>DeepSeek</span></a>
+   <a class="platform-link" href="https://wenxin.baidu.com/" target="_blank" rel="noopener noreferrer" title="打开文心一言"><img src="assets/platform-wenxin.svg" alt="" width="23" height="23"><span>文心一言</span></a>
+   <a class="platform-link" href="https://www.qianwen.com/chat" target="_blank" rel="noopener noreferrer" title="打开千问"><img src="assets/platform-qianwen.svg" alt="" width="23" height="23"><span>千问</span></a>
+   <a class="platform-link" href="https://yuanbao.tencent.com/chat/" target="_blank" rel="noopener noreferrer" title="打开元宝"><img src="assets/platform-yuanbao.svg" alt="" width="23" height="23"><span>元宝</span></a>
+   <a class="platform-link" href="https://www.kimi.com/" target="_blank" rel="noopener noreferrer" title="打开 Kimi"><img src="assets/platform-kimi.svg" alt="" width="23" height="23"><span>Kimi</span></a>
+  </nav>
+  <nav class="platform-nav external-platform-nav" aria-label="Gemini 和 ChatGPT 快捷入口">
+   <a class="platform-link" href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer">Gemini</a>
+   <a class="platform-link" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">ChatGPT</a>
+  </nav>
+ </section>
+
+ <section class="panel-card import" aria-labelledby="captureHeading">
+  <h1 id="captureHeading">采集问答与信源</h1>
+  <p class="muted">登录 AI 网页，点击想采集的回答，再导入或截图。</p>
+  <label>关键词／任务名<input id="keyword" placeholder="留空使用当前页面标题"></label>
+  <div class="row">
+   <select id="scope" aria-label="导入范围">
+    <option value="current">当前回答</option>
+    <option value="selection">手动选中的回答／信源</option>
+    <option value="conversation">已加载的整个对话</option>
+   </select>
+   <button id="import" class="primary">导入信源</button>
+  </div>
+  <div class="row capture-tools">
+   <label class="check"><input id="captureOnImport" type="checkbox">导入时保存问答截图</label>
+   <button id="captureAnswer" aria-describedby="captureHelp">截取提问与回答</button>
+  </div>
+  <div id="screenshots" aria-label="页面截图"></div>
+  <p id="captureHelp" class="muted field-help">截图时保持 AI 页面显示，完成后会恢复滚动位置。</p>
+  <div class="extra-tools">
+   <details>
+    <summary>手动补充链接</summary>
+    <textarea id="manualUrls" rows="3" aria-label="要补充的信源链接" placeholder="每行一个文章或视频链接"></textarea>
+    <button id="manualImport">建立链接任务</button>
+    <p class="muted field-help">也可先在网页拖选回答和链接，再选「手动选中的回答／信源」导入。</p>
+   </details>
+   <button id="diagnose" class="text">诊断当前页面</button>
+  </div>
+ </section>
+
+ <section class="panel-card workspace" aria-labelledby="workspaceHeading">
+  <div class="row"><h2 id="workspaceHeading">信源与导出</h2><button id="refresh" class="text">刷新</button></div>
+  <label>任务记录<select id="taskSelect"><option value="">暂无任务</option></select></label>
+  <div class="row task-tools">
+   <button id="renameTask" class="text" disabled>修改任务名</button>
+   <button id="manageLibrary" class="text">管理／清理记录</button>
+  </div>
+  <div id="taskMeta" class="muted"></div>
+  <div class="row export-location">
+   <label>导出到<select id="exportDestination"><option value="chrome">Chrome 下载</option><option value="folder" disabled>指定文件夹</option></select></label>
+   <button id="openExportFolder">打开文件夹</button>
+  </div>
+  <p id="exportLocation" class="muted" hidden></p>
+  <div class="row export">
+   <button id="exportXlsx" disabled>导出 Excel</button>
+   <button id="exportMarkdown" disabled>导出 Markdown</button>
+  </div>
+  <p id="exportName" class="muted" hidden></p>
+  <div id="sourceToolbar" class="toolbar" hidden>
+   <div class="row"><h3>信源列表</h3><label class="check"><input id="selectAll" type="checkbox" checked>全选</label></div>
+   <p class="muted">导入后即可导出。需要正文或视频发布文案时，再补采原网页。</p>
+   <details id="extractionTools">
+    <summary>批量补采原文与素材</summary>
+    <label class="check"><input id="downloadVideo" type="checkbox">本次同时保存视频／图集</label>
+    <button id="process" disabled>提取所选信源</button>
+   </details>
+  </div>
+  <div id="progress" class="progress" hidden><div id="progressBar"></div></div>
+  <p id="progressLabel" class="muted"></p>
+  <div id="sources"><div class="empty">导入后可在这里查看信源。</div></div>
+ </section>
+</main>
+<dialog id="folderDialog" aria-labelledby="folderDialogTitle">
+ <div class="row"><h2 id="folderDialogTitle">选择导出文件夹</h2><button id="folderCancel">取消</button></div>
+ <label>快速定位<select id="folderQuick" disabled><option value="">选择位置</option></select></label>
+ <p id="folderCurrent" class="muted"></p>
+ <button id="folderUp" disabled>上一级</button>
+ <div id="folderEntries" aria-label="子文件夹列表"></div>
+ <p id="folderBrowseStatus" class="muted folder-feedback" role="status" hidden></p>
+ <button id="folderConfirm" class="primary" disabled>使用当前文件夹</button>
+</dialog>
+<dialog id="detailDialog"><div class="row"><h2 id="detailTitle"></h2><button id="detailClose">关闭</button></div><div id="detailContent"></div></dialog>
+<dialog id="renameDialog"><h2>修改关键词／任务名</h2><p class="muted">用于列表和导出文件名。日期保留任务创建日期，平台自动识别。</p><label>任务名<input id="renameKeyword" maxlength="150"></label><div class="row"><button id="renameCancel">取消</button><button id="renameSave" class="primary">保存名称</button></div></dialog>
+<dialog id="libraryDialog"><div class="row"><h2>本机任务记录</h2><button id="libraryClose">关闭</button></div><p id="libraryStats" class="muted"></p><p id="libraryPath" class="muted"></p><p class="muted">任务持续保留，由你选择清理。移到回收站可恢复；永久删除才会释放磁盘空间。已导出的 Excel／Markdown 保留。</p><label>查看<select id="libraryView"><option value="tasks">任务及隐藏的测试记录</option><option value="trash">回收站</option></select></label><label class="check"><input type="checkbox" id="librarySelectAll">选择本页可清理的记录</label><div id="libraryRows"></div><p id="libraryStatus" role="status" class="muted"></p><div class="row library-actions"><button id="libraryTrash" class="primary">移到回收站</button><button id="libraryRestore" hidden>恢复所选</button><button id="libraryPurge" class="danger" hidden>永久删除所选</button></div></dialog>
+<dialog id="cleanupDialog"><h2 id="cleanupTitle">确认清理</h2><p id="cleanupText"></p><div class="row"><button id="cleanupCancel">取消</button><button id="cleanupConfirm" class="primary">确认</button></div></dialog>
+<input type="file" id="videoFile" accept="video/*" hidden>
+<footer>V1.4.15 · 本机资料库 <span id="scriptState">脚本未启动</span><span id="runtimeVersions">正在核对运行版本…</span>
+ <div class="technical-support">技术支持：<a id="technicalSupportLink" href="https://www.020yueshi.com/GEO-XY.html" target="_blank" rel="noopener noreferrer">体系致胜GEO</a></div>
+</footer>
+<script src="panel-bootstrap.js"></script><script type="module" src="panel.js"></script></body></html>

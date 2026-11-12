@@ -1,0 +1,11 @@
+# V1.4.6 cross-platform-r1: Python 3.12, binary resolution verified for
+# Windows x64, macOS Apple Silicon and macOS Intel on 2026-10-15.
+certifi==2026.7.22
+charset-normalizer==3.5.2
+et-xmlfile==2.0.0
+idna==3.20
+imageio-ffmpeg==0.6.0
+openpyxl==3.1.5
+Pillow==12.3.0
+requests==2.34.2
+urllib3==2.8.0

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>体系致胜GEO-信源助手 V1.4.15 · Windows / Mac 安装</title>
+<style>
+body{font:16px/1.85 system-ui,-apple-system,"Microsoft YaHei",sans-serif;background:#f7f8f2;color:#233e38;max-width:900px;margin:40px auto;padding:0 24px}
+h1{font-size:30px;line-height:1.4}h2{font-size:21px;margin-top:0}
+section{padding:24px;background:#fff;border:1px solid #dfe5dc;border-radius:14px;margin:20px 0}
+code{background:#edf1e9;padding:3px 6px;border-radius:5px;overflow-wrap:anywhere}
+li{margin:9px 0}a{color:#245b52}small{color:#66756e}table{border-collapse:collapse;width:100%}td,th{border:1px solid #dfe5dc;padding:10px;text-align:left}
+</style>
+<h1>体系致胜GEO-信源助手 <small>V1.4.15</small></h1>
+<p>八平台信源导入 · 提问与完整回答截图 · Excel / Markdown 导出</p>
+<p>Windows 已使用验证；Mac 安装入口已准备，等待实机测试。完整功能需要 Chrome 插件和本机服务配合。</p>
+<section><h2>Mac 首次安装</h2><ol>
+<li>完整解压运行包到长期保存的文件夹，例如“文稿”。</li>
+<li>双击 <strong>安装依赖.command</strong>，首次联网准备 uv、Python 3.12 和 Mac 依赖。</li>
+<li>双击 <strong>启动服务.command</strong>，启动后自动打开连接码文件。</li>
+<li>在 Chrome 输入 <code>chrome://extensions</code>，打开“开发者模式”，点击“加载已解压的扩展程序”，选择本文件旁边的 <strong>extension</strong> 文件夹。</li>
+<li>打开插件侧栏，把连接码粘贴到设置中，点击“保存并连接”。</li>
+</ol><p>双击提示没有执行权限时，在终端输入 <code>cd </code>，把解压后的文件夹拖入终端并回车，再运行 <code>bash ./安装依赖.command</code> 和 <code>bash ./启动服务.command</code>。</p></section>
+<section><h2>Windows 首次安装</h2><ol>
+<li>完整解压运行包，双击 <strong>安装依赖.cmd</strong>。</li>
+<li>完成后双击 <strong>启动服务.cmd</strong>，自动打开连接码文件。</li>
+<li>在 <code>chrome://extensions</code> 打开“开发者模式”，加载本目录的 <strong>extension</strong> 文件夹。</li>
+<li>在插件设置里粘贴本机连接码并连接。</li>
+</ol><p>当前 Windows 原目录可以继续使用，无需为了 Mac 测试重复安装。不要在同一电脑同时启动多个目录的服务。</p></section>
+<section><h2>文件和服务在哪里</h2>
+<p>连接码：<code>data/pairing-token.txt</code>。任务、截图和素材：<code>data/tasks/</code>。日志：<code>data/service.log</code>、<code>data/service-error.log</code>。</p>
+<p>每台电脑独立生成资料库和连接码。运行包不含原电脑的私人任务、API Key 或虚拟环境。不需要 Codex、CDP 调试、Node.js 或 Homebrew。</p>
+<table><tr><th>操作</th><th>Mac</th><th>Windows</th></tr>
+<tr><td>停止服务并保留数据</td><td>停止服务.command</td><td>停止服务.cmd</td></tr>
+<tr><td>重启服务</td><td>重启服务.command</td><td>重启服务.cmd</td></tr>
+<tr><td>检查环境和状态</td><td>检查环境.command</td><td>检查环境.cmd</td></tr></table>
+<p>电脑重启后重新运行“启动服务”。启动成功后可关闭窗口，服务继续运行。</p></section>
+<section><h2>Mac 测试重点</h2><ol>
+<li>侧栏显示本机已连接，四项运行版本均为 1.4.15。</li>
+<li>豆包、DeepSeek、文心一言、千问、元宝、Kimi、Gemini、ChatGPT 各导入一个带信源的回答。</li>
+<li>截图包含原提问和完整回答，没有左侧历史栏；也在 Retina 屏幕检查清晰度。</li>
+<li>用侧栏顶部的“下载截图”保存 PNG，再导出 Excel 和 Markdown，核对中文文件名及正文。</li>
+<li>停止、重启服务后任务和截图仍在。</li></ol>
+<p>首次截图按插件和 Chrome 的实际权限提示操作；保持当前 AI 标签页显示，不改变窗口大小。导入、截图和导出无需 API Key。</p>
+<p>详细步骤和故障处理见 <a href="docs/跨平台安装与Mac测试.md">跨平台安装与 Mac 测试说明</a>。</p></section>
+<p><small>安装器缺少 uv 时使用 <a href="https://docs.astral.sh/uv/getting-started/installation/">Astral 官方安装源</a>，安装到当前用户目录，不修改 shell 配置。基础依赖锁定版本，分别检查 Windows x64、Mac Apple Silicon 和 Intel 的预编译包；Mac 实机验收仍待完成。</small></p>
+</html>
+

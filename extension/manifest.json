@@ -1,0 +1,83 @@
+{
+  "manifest_version": 3,
+  "name": "体系致胜GEO-信源助手",
+  "description": "收集八个 AI 平台的问答截图和参考信源，导出 Excel 与 Markdown。",
+  "version": "1.4.15",
+  "minimum_chrome_version": "120",
+  "icons": {
+    "16": "assets/icon16.png",
+    "48": "assets/icon48.png",
+    "128": "assets/icon128.png"
+  },
+  "permissions": [
+    "activeTab",
+    "storage",
+    "sidePanel",
+    "tabs",
+    "scripting",
+    "alarms",
+    "webRequest",
+    "downloads"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1:18765/*",
+    "https://chatgpt.com/*",
+    "https://gemini.google.com/*",
+    "https://www.doubao.com/*",
+    "https://chat.deepseek.com/*",
+    "https://*.douyin.com/*",
+    "https://*.douyinvod.com/*",
+    "https://*.bytecdn.cn/*",
+    "https://yuanbao.tencent.com/*",
+    "https://yiyan.baidu.com/*",
+    "https://wenxin.baidu.com/*",
+    "https://www.kimi.com/*",
+    "https://kimi.com/*",
+    "https://kimi.moonshot.cn/*",
+    "https://www.kimi.ai/*",
+    "https://www.qianwen.com/*",
+    "https://qianwen.com/*",
+    "https://www.tongyi.com/*",
+    "https://tongyi.aliyun.com/*"
+  ],
+  "optional_host_permissions": [
+    "<all_urls>",
+    "https://*/*",
+    "http://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "打开体系致胜GEO-信源助手"
+  },
+  "side_panel": {
+    "default_path": "panel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://gemini.google.com/*",
+        "https://www.doubao.com/*",
+        "https://chat.deepseek.com/*",
+        "https://yuanbao.tencent.com/*",
+        "https://yiyan.baidu.com/*",
+        "https://wenxin.baidu.com/*",
+        "https://www.kimi.com/*",
+        "https://kimi.com/*",
+        "https://kimi.moonshot.cn/*",
+        "https://www.kimi.ai/*",
+        "https://www.qianwen.com/*",
+        "https://qianwen.com/*",
+        "https://www.tongyi.com/*",
+        "https://tongyi.aliyun.com/*"
+      ],
+      "js": [
+        "collector.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
