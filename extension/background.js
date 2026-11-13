@@ -2,7 +2,7 @@ import {dedupeSources,platformName} from './core.js';
 import {captureAnswer,captureRunning,captureBuild} from './screenshot.js';
 import {readChatGptCitations} from './chatgpt-sources.js';
 const SERVICE='http://127.0.0.1:18765';
-const BUILD='1.4.16';
+const BUILD='1.4.18';
 let ticking=false;
 // Keep an explicit toolbar action. Some side-panel paths still lack activeTab;
 // the panel offers an optional permission prompt when native capture rejects it.

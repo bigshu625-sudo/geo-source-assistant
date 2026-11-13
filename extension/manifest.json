@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "体系致胜GEO-信源助手",
   "description": "收集八个 AI 平台的问答截图和参考信源，导出 Excel 与 Markdown。",
-  "version": "1.4.16",
+  "version": "1.4.18",
   "minimum_chrome_version": "120",
   "icons": {
     "16": "assets/icon16.png",

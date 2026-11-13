@@ -1,7 +1,7 @@
 import {platformName} from './core.js';
 import {createCaptureReader} from './capture-visible.js';
 let captureBusy=false;
-export const captureBuild='1.4.16';
+export const captureBuild='1.4.18';
 export const captureRunning=()=>captureBusy;
 const readVisibleTab=createCaptureReader((windowId,options)=>chrome.tabs.captureVisibleTab(windowId,options));
 async function verifyActive(tab){const [active]=await chrome.tabs.query({active:true,windowId:tab.windowId});if(active?.id!==tab.id)throw new Error('截图期间切换了标签页，截图已取消。请保持 AI 页面显示后重试。');}
@@ -11,9 +11,9 @@ async function evaluate(tabId,method,args=[]){
       const helper=method==='captureInfo'?globalThis.AISourceCollector:globalThis.AISourceCapture;
       if(typeof helper?.[method]!=='function')throw new Error('页面截图脚本尚未就绪，请刷新 AI 页面后重试。');
       return {ok:true,value:await helper[method](...args)};
-    }catch(error){return {ok:false,error:error.message};}
+    }catch(error){return {ok:false,error:error.message,frameGeometry:error.frameGeometry};}
   },args:[method,args]});
-  if(!result?.result?.ok)throw new Error(result?.result?.error||'页面没有返回截图数据，请刷新页面后重试。');
+  if(!result?.result?.ok)throw Object.assign(new Error(result?.result?.error||'页面没有返回截图数据，请刷新页面后重试。'),{frameGeometry:result?.result?.frameGeometry});
   return result.result.value;
 }
 async function crop(dataUrl,rect){
@@ -68,7 +68,7 @@ export async function captureAnswer(message,api){
     }
     throw new Error('回答过长，本次未保存不完整截图。请选择较短的回答后重试。');
   }catch(error){
-    if(!error.captureContext)error.captureContext={origin:metadata?.origin||tab?.url||'',stage:metadata?'capture':'prepare'};
+    if(!error.captureContext)error.captureContext={origin:metadata?.origin||tab?.url||'',stage:metadata?'capture':'prepare',frameGeometry:error.frameGeometry};
     throw error;
   }finally{
     if(tab?.id)try{await evaluate(tab.id,'finish');}catch{}

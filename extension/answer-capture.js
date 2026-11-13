@@ -1,5 +1,5 @@
 (() => {
-  if(globalThis.AISourceCapture?.version===4)return;
+  if(globalThis.AISourceCapture?.version===6)return;
   globalThis.AISourceCapture?.finish();
   let state=null;
   const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -7,10 +7,16 @@
   function finish(){
     if(!state)return;
     const previous=state;state=null;clearTimeout(previous.timer);
-    previous.style.remove();previous.root.removeAttribute('data-ai-answer-capture');
+    previous.root.removeAttribute('data-ai-answer-capture');
     previous.question.removeAttribute('data-ai-question-capture');
     for(const element of previous.excluded)element.removeAttribute('data-ai-capture-exclude');
+    if(previous.kimi?.active){
+      const {content, originalValue, originalPriority}=previous.kimi;
+      if(originalValue)content.style.setProperty('translate',originalValue,originalPriority);
+      else content.style.removeProperty('translate');
+    }
     for(const [element,left,top]of previous.positions.slice().reverse())element.scrollTo({left,top,behavior:'instant'});
+    previous.style.remove();
   }
   async function begin(){
     if(state)throw new Error('页面截图正在进行，请等待完成。');
@@ -22,7 +28,7 @@
     let common=root;while(common&&!common.contains(question))common=common.parentElement;
     if(!common)throw new Error('提问与回答区域已变化，请刷新页面后重试。');
     const scrollables=[];
-    for(let e=common;e;e=e.parentElement){const s=getComputedStyle(e);if(/auto|scroll|overlay/.test(s.overflowY)&&e.scrollHeight>e.clientHeight+4)scrollables.push(e);}
+    for(let e=common;e;e=e.parentElement){const s=getComputedStyle(e);if(/^(auto|scroll|overlay|hidden)$/.test(s.overflowY)&&e.scrollHeight>e.clientHeight+4)scrollables.push(e);}
     const documentScroll=document.scrollingElement;
     if(!scrollables.includes(documentScroll))scrollables.push(documentScroll);
     const positions=scrollables.map(e=>[e,e.scrollLeft,e.scrollTop]);
@@ -33,8 +39,29 @@
     if(location.hostname==='gemini.google.com')for(const overlay of root.querySelectorAll('.hover-card-container,[role="dialog"]')){
       overlay.setAttribute('data-ai-capture-exclude','');excluded.push(overlay);
     }
-    const style=document.createElement('style');style.textContent='html *,html{scroll-behavior:auto!important;animation-play-state:paused!important;transition:none!important;caret-color:transparent!important}[data-ai-capture-exclude][data-ai-capture-exclude][data-ai-capture-exclude],[data-ai-capture-exclude][data-ai-capture-exclude][data-ai-capture-exclude] *{visibility:hidden!important}';
-    state={root,question,positions,style,excluded,scroller:scrollables[0],height:0,width:0,timer:setTimeout(finish,150000)};
+    const style=document.createElement('style');
+    // Capture offsets must not be rounded to a scroll snap point or moved by scroll anchoring.
+    style.textContent=`
+      html *, html {
+        scroll-behavior: auto !important;
+        scroll-snap-type: none !important;
+        overflow-anchor: none !important;
+        animation-play-state: paused !important;
+        transition: none !important;
+        caret-color: transparent !important;
+      }
+      [data-ai-capture-exclude][data-ai-capture-exclude][data-ai-capture-exclude],
+      [data-ai-capture-exclude][data-ai-capture-exclude][data-ai-capture-exclude] * {
+        visibility: hidden !important;
+      }
+    `;
+    const scroller=scrollables[0];
+    const kimiContent=/(^|\.)kimi\.(com|ai|moonshot\.cn)$/.test(location.hostname)&&scroller.matches('.chat-detail-main')
+      ? scroller.querySelector(':scope > .chat-content-container') : null;
+    const kimi=kimiContent?.contains(root)&&kimiContent.contains(question)&&getComputedStyle(kimiContent).translate==='none'
+      ? {content:kimiContent, originalValue:kimiContent.style.getPropertyValue('translate'),
+        originalPriority:kimiContent.style.getPropertyPriority('translate'), offset:0, active:false} : null;
+    state={root,question,positions,style,excluded,scroller,kimi,height:0,width:0,timer:setTimeout(finish,150000)};
     root.setAttribute('data-ai-answer-capture','');question.setAttribute('data-ai-question-capture','');document.documentElement.append(style);
     try{
       await Promise.race([document.fonts?.ready||Promise.resolve(),pause(1200)]);
@@ -52,19 +79,39 @@
   }
   async function frame(offset){
     if(!state||!state.root.isConnected)throw new Error('回答区域已变化，请重新截图。');
-    const {root,scroller}=state;
-    let scrollRect=scroller===document.scrollingElement?{top:0,left:0,bottom:innerHeight,right:innerWidth}:scroller.getBoundingClientRect();
-    const boundaryTop=Math.max(0,scrollRect.top+(scroller===document.scrollingElement?0:scroller.clientTop));
-    const r=bounds();
-    scroller.scrollTo({top:scroller.scrollTop+r.top-boundaryTop+offset,left:scroller.scrollLeft,behavior:'instant'});
+    const {scroller,kimi}=state;
+    const viewport=()=>scroller===document.scrollingElement?{top:0,left:0,bottom:innerHeight,right:innerWidth}:scroller.getBoundingClientRect();
+    const scrollTopBoundary=()=>Math.max(0,viewport().top+(scroller===document.scrollingElement?0:scroller.clientTop));
+    if(!kimi?.active){
+      scroller.scrollTo({top:scroller.scrollTop+bounds().top-scrollTopBoundary()+offset,left:scroller.scrollLeft,behavior:'instant'});
+    }
     await painted();await pause(100);
+    if(kimi){
+      const r=bounds();
+      const clipTop=scrollTopBoundary();
+      const clipBottom=Math.min(innerHeight,viewport().bottom,r.bottom);
+      if(kimi.active||r.top+offset<clipTop-2||r.top+offset>=clipBottom-1){
+        // Kimi can reset the chat scroller after a programmatic jump. Keep the
+        // scroll position and move only the verified conversation content.
+        kimi.active=true;
+        kimi.offset+=clipTop-(r.top+offset);
+        kimi.content.style.setProperty('translate',`0 ${kimi.offset}px`,'important');
+        await painted();
+      }
+    }
     const rect=bounds();
     if(Math.abs(rect.height-state.height)>2||Math.abs(rect.width-state.width)>2)throw new Error('回答布局正在变化，请等待生成和图片加载完成后重新截图。');
-    scrollRect=scroller===document.scrollingElement?{top:0,left:0,bottom:innerHeight,right:innerWidth}:scroller.getBoundingClientRect();
+    const scrollRect=viewport();
     const top=Math.max(0,scrollRect.top+(scroller===document.scrollingElement?0:scroller.clientTop),rect.top+offset);
     const bottom=Math.min(innerHeight,scrollRect.bottom,rect.bottom);
     const left=Math.max(0,scrollRect.left,rect.left);const right=Math.min(innerWidth,scrollRect.right,rect.right);
-    if(top-rect.top>offset+2||bottom-top<1||right-left<2)throw new Error('回答区域被遮挡或无法继续滚动，请展开回答并保持页面可见后重试。');
+    if(top-rect.top>offset+2||bottom-top<1||right-left<2){
+      throw Object.assign(new Error('回答区域被遮挡或无法继续滚动，请展开回答并保持页面可见后重试。'), {
+        frameGeometry:{offset, visibleStart:top-rect.top, visibleEnd:bottom-rect.top, width:right-left,
+          scrollTop:scroller.scrollTop, maxScrollTop:scroller.scrollHeight-scroller.clientHeight,
+          overflowY:getComputedStyle(scroller).overflowY},
+      });
+    }
     if(right-left<state.width-2)throw new Error('回答横向超出窗口，请调整浏览器宽度后重新截图。');
     return {x:left,y:top,width:right-left,height:bottom-top,offset:top-rect.top,next:bottom-rect.top,total:state.height,viewportWidth:innerWidth,viewportHeight:innerHeight};
   }
@@ -77,6 +124,6 @@
     if(!state?.root.isConnected||!state.question.isConnected||AISourceCollector.questionFor(state.root)!==state.question)throw new Error('提问或回答区域已变化，请重新截图。');
     return AISourceCollector.captureInfo(state.root);
   }
-  globalThis.AISourceCapture={version:4,begin,frame,verify,snapshot,finish};
+  globalThis.AISourceCapture={version:6,begin,frame,verify,snapshot,finish};
   addEventListener('pagehide',finish);
 })();

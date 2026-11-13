@@ -1,6 +1,6 @@
 # 体系致胜GEO-信源分析助手
 
-**简称「信源助手」** · **TXZS GEO Source Analysis Assistant** · **v1.4.16**
+**简称「信源助手」** · **TXZS GEO Source Analysis Assistant** · **v1.4.18**
 
 [简体中文](#中文) · [English](#english) · [架构说明 / Architecture](docs/ARCHITECTURE.md)
 
@@ -10,7 +10,7 @@
 
 **一键保存 AI 问答截图和可见信源，方便后续做 GEO 逆向研究。** 信源助手在 Chrome 侧栏运行。它把原提问、回答和页面展示的参考资料归到同一个本机任务，可导出 PNG、Markdown 和 Excel。用同一个问题在不同平台提问后，可以对照回答引用了哪些网站和内容、来源类型如何分布，以及不同平台或不同时间的引用有何变化。
 
-**平台支持。** V1.4.16 支持豆包、DeepSeek、文心一言、千问、腾讯元宝、Kimi、Gemini 和 ChatGPT。Gemini 和 ChatGPT 可读取回答中的网页引用，并保存问答截图。[ChatGPT 网页版](https://chatgpt.com/) · [Gemini 网页版](https://gemini.google.com/app)
+**平台支持。** V1.4.18 支持豆包、DeepSeek、文心一言、千问、腾讯元宝、Kimi、Gemini 和 ChatGPT。Gemini 和 ChatGPT 可读取回答中的网页引用，并保存问答截图。[ChatGPT 网页版](https://chatgpt.com/) · [Gemini 网页版](https://gemini.google.com/app)
 
 **使用条件。** 在同一个 Chrome 浏览器中打开并登录要采集的 AI 平台网页版，用该账号正常提问。扩展从当前打开的回答页面读取可见内容。使用截图和信源导出只需连接本机服务。
 
@@ -76,7 +76,7 @@
 
 **Save AI answers and visible citations in one step for generative engine optimization (GEO) research.** TXZS GEO Source Analysis Assistant runs in Chrome's side panel. It keeps the question, answer, and displayed references together in a local task and exports PNG, Markdown, and Excel files. Ask the same question across platforms to compare cited websites and source types, then repeat it over time to see how those citations change.
 
-**Platform support.** V1.4.16 supports Doubao, DeepSeek, Baidu Wenxin (ERNIE), Qianwen (Qwen), Tencent Yuanbao, Kimi, Gemini, and ChatGPT. The extension collects web citations and Q&A screenshots from Gemini and ChatGPT. [ChatGPT web app](https://chatgpt.com/) · [Gemini web app](https://gemini.google.com/app)
+**Platform support.** V1.4.18 supports Doubao, DeepSeek, Baidu Wenxin (ERNIE), Qianwen (Qwen), Tencent Yuanbao, Kimi, Gemini, and ChatGPT. The extension collects web citations and Q&A screenshots from Gemini and ChatGPT. [ChatGPT web app](https://chatgpt.com/) · [Gemini web app](https://gemini.google.com/app)
 
 **Browser setup.** Sign in to each AI platform's web app in the same Chrome browser and ask your question there. The extension reads visible content from the open answer page. Screenshots and citation exports use the local companion service.
 
