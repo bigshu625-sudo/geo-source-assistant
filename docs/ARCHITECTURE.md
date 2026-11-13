@@ -45,7 +45,7 @@ flowchart TD
 1. **导入**。侧栏把采集请求交给扩展后台。页面脚本读取选中范围的回答和引用。后台合并重复链接、保留原始 URL，再通过 `POST /tasks` 保存任务。页面标注的引用总数高于实际读到的数量时，任务会附带提示。
 2. **按需补采**。用户主动补采时，后台在 Chrome 存储中维护待办队列和当前采集项。每次打开一个后台信源标签页，读取正文或发布文案，交给本机服务保存。仅在本次任务明确勾选时下载视频或图集。标签页超时或提取失败时记录原因。服务重启时，有已保存文件的中断项标为部分完成，其余中断项回到待处理状态。
 3. **问答截图**。截图模块从本轮提问顶部开始滚动。每段用 `chrome.tabs.captureVisibleTab` 获取画面，再裁剪成问答区域。截图结束前再次检查标签页、页面和问答内容，成功后把完整分段发给 `POST /screenshots`。本机服务按页面和回答内容匹配任务，先在暂存目录拼接，再保存 PNG。长图可拆分，页面发生变化时取消本次保存。
-4. **导出**。本机服务直接生成 XLSX 或 Markdown。Excel 为超长单元格生成续列，Markdown 保留长文本和截图相对路径。用户可选 Chrome 下载，或由本机服务写入已配置目录下的任务子文件夹；另存操作保留同名的不同文件。截图使用任务对应的关键词、创建日期和平台命名，日期按 UTC+8 计算。
+4. **导出**。本机服务直接生成 XLSX 或 Markdown。Excel 为超长单元格生成续列，Markdown 保留长文本和截图链接。指定目录模式下，截图直接保存在选中的目录，文档归入任务子文件夹。同名的不同图片追加编号。截图使用任务对应的关键词、创建日期和平台命名，日期按 UTC+8 计算。
 
 ### 存储
 
@@ -99,7 +99,7 @@ data/
 1. **Import.** The panel sends a collection request to the extension worker. The page collector reads the answer and citations within the selected scope. The worker merges duplicate links, preserves the original URLs, and saves a task with `POST /tasks`. A warning is recorded when the page advertises more citations than the collector finds.
 2. **Collect optional source content.** When requested, the worker stores pending jobs and the active job in Chrome storage. It opens one background source tab at a time and sends the extracted article text or caption to the local service. It downloads videos and galleries only when selected for that run. Timeouts and extraction errors are recorded on the task. On service restart, interrupted items with saved files are marked partial and the others return to pending.
 3. **Capture the Q&A.** The capture module scrolls from the top of the question, calls `chrome.tabs.captureVisibleTab`, and crops each image to the Q&A region. It checks the active tab, page, and question and answer text before submitting the complete set of segments to `POST /screenshots`. The service matches the task by page and answer content, stitches in a staging directory, and saves the PNGs. Long images may be split. A change to the page or Q&A cancels the capture.
-4. **Export.** The service generates XLSX or Markdown directly. Excel splits oversized values into continuation columns. Markdown keeps the full text and relative screenshot links. Users can use Chrome downloads or save copies into per-task subfolders under a configured local directory. Existing files with different contents are kept. Screenshot names use the task keyword, creation date in UTC+8, and platform.
+4. **Export.** The service generates XLSX or Markdown directly. Excel splits oversized values into continuation columns. Markdown keeps the full text and screenshot links. When a custom destination is selected, screenshots go into the selected folder and documents go into per-task subfolders. Different screenshots with the same name receive numbered suffixes. Screenshot names use the task keyword, creation date in UTC+8, and platform.
 
 ### Storage
 

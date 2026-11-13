@@ -6,7 +6,7 @@
  window.addEventListener('error',event=>{const message='侧栏脚本错误：'+(event.message||event.target?.src||'资源加载失败');show(message,true);saveError(message);},true);
  window.addEventListener('unhandledrejection',event=>{const message='侧栏运行错误：'+String(event.reason?.message||event.reason);show(message,true);saveError(message);});
  document.getElementById('scriptState').textContent='诊断已就绪';
- const expectedBuild='1.4.15';
+ const expectedBuild='1.4.16';
  const checkBuild=async()=>{
   const result=await chrome.runtime.sendMessage({type:'BUILD'});
   const details={kind:'PANEL_BUILD',panelBuild:expectedBuild,backgroundBuild:result?.data?.build||'未知',captureBuild:result?.data?.captureBuild||'旧版',manifestVersion:chrome.runtime.getManifest().version,extensionId:chrome.runtime.id};

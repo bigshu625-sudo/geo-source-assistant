@@ -1,6 +1,6 @@
 # 体系致胜GEO-信源分析助手
 
-**简称「信源助手」** · **TXZS GEO Source Analysis Assistant** · **v1.4.15**
+**简称「信源助手」** · **TXZS GEO Source Analysis Assistant** · **v1.4.16**
 
 [简体中文](#中文) · [English](#english) · [架构说明 / Architecture](docs/ARCHITECTURE.md)
 
@@ -10,7 +10,7 @@
 
 **一键保存 AI 问答截图和可见信源，方便后续做 GEO 逆向研究。** 信源助手在 Chrome 侧栏运行。它把原提问、回答和页面展示的参考资料归到同一个本机任务，可导出 PNG、Markdown 和 Excel。用同一个问题在不同平台提问后，可以对照回答引用了哪些网站和内容、来源类型如何分布，以及不同平台或不同时间的引用有何变化。
 
-**平台支持。** V1.4.15 支持豆包、DeepSeek、文心一言、千问、腾讯元宝、Kimi、Gemini 和 ChatGPT。Gemini 和 ChatGPT 可读取回答中的网页引用，并保存问答截图。[ChatGPT 网页版](https://chatgpt.com/) · [Gemini 网页版](https://gemini.google.com/app)
+**平台支持。** V1.4.16 支持豆包、DeepSeek、文心一言、千问、腾讯元宝、Kimi、Gemini 和 ChatGPT。Gemini 和 ChatGPT 可读取回答中的网页引用，并保存问答截图。[ChatGPT 网页版](https://chatgpt.com/) · [Gemini 网页版](https://gemini.google.com/app)
 
 **使用条件。** 在同一个 Chrome 浏览器中打开并登录要采集的 AI 平台网页版，用该账号正常提问。扩展从当前打开的回答页面读取可见内容。使用截图和信源导出只需连接本机服务。
 
@@ -58,7 +58,7 @@
 
 文件下载到 Chrome 下载目录下的 `体系致胜GEO-信源助手` 子目录，按「关键词-任务日期-平台」命名，例如 `别墅电梯推荐-20261111-Doubao-问答截图.png`。将导出的 Markdown 和对应 PNG 放在同一目录，支持本地图片的 Markdown 阅读器即可显示截图。
 
-要改保存位置，在 **设置 → 资料文件夹** 点击 **选择文件夹**，在侧栏中进入想用的目录，再点 **使用当前文件夹**。也可以填写已存在的完整路径并保存。在 **信源与导出 → 导出到** 可切换「指定文件夹」和「Chrome 下载」，也可打开当前选择的位置。指定文件夹内按任务分组；Excel、Markdown 和截图按需分别保存。只想留在本机资料库时，采集完无需导出，可在设置里点 **打开本机资料库**。
+要改保存位置，在 **设置 → 资料文件夹** 点击 **选择文件夹**，在侧栏中进入想用的目录，再点 **使用当前文件夹**。也可以填写已存在的完整路径并保存。在 **信源与导出 → 导出到** 可切换「指定文件夹」和「Chrome 下载」，也可打开当前选择的位置。点 **保存截图** 时，PNG 直接写入选中的目录，同名的不同图片会另加编号。Excel 和 Markdown 按任务归档。如需一起分享 Markdown 和图片，先保存截图，再导出 Markdown。只想留在本机资料库时，采集完无需导出，可在设置里点 **打开本机资料库**。
 
 ### 按需补采原文与素材
 
@@ -76,7 +76,7 @@
 
 **Save AI answers and visible citations in one step for generative engine optimization (GEO) research.** TXZS GEO Source Analysis Assistant runs in Chrome's side panel. It keeps the question, answer, and displayed references together in a local task and exports PNG, Markdown, and Excel files. Ask the same question across platforms to compare cited websites and source types, then repeat it over time to see how those citations change.
 
-**Platform support.** V1.4.15 supports Doubao, DeepSeek, Baidu Wenxin (ERNIE), Qianwen (Qwen), Tencent Yuanbao, Kimi, Gemini, and ChatGPT. The extension collects web citations and Q&A screenshots from Gemini and ChatGPT. [ChatGPT web app](https://chatgpt.com/) · [Gemini web app](https://gemini.google.com/app)
+**Platform support.** V1.4.16 supports Doubao, DeepSeek, Baidu Wenxin (ERNIE), Qianwen (Qwen), Tencent Yuanbao, Kimi, Gemini, and ChatGPT. The extension collects web citations and Q&A screenshots from Gemini and ChatGPT. [ChatGPT web app](https://chatgpt.com/) · [Gemini web app](https://gemini.google.com/app)
 
 **Browser setup.** Sign in to each AI platform's web app in the same Chrome browser and ask your question there. The extension reads visible content from the open answer page. Screenshots and citation exports use the local companion service.
 
@@ -124,7 +124,7 @@ Select a task under **任务记录** (Task history) and check the task name at t
 
 Downloads go into the `体系致胜GEO-信源助手` subfolder of Chrome's downloads directory. Filenames include the keyword, task date, and platform, for example `别墅电梯推荐-20261111-Doubao-问答截图.png`. Keep the Markdown and its PNGs together to see the images in a Markdown viewer that supports local files.
 
-To save elsewhere, open **设置 → 资料文件夹** (Settings → Folders), browse to a folder in the side panel, and choose **使用当前文件夹** (Use this folder). You can also enter an existing folder's full path. Use **导出到** (Export to) to switch between Chrome downloads and your chosen folder, and **打开文件夹** (Open folder) to locate the current destination. Custom exports are grouped by task. Excel, Markdown, and PNG copies are optional; collected records remain in the local library.
+To save elsewhere, open **设置 → 资料文件夹** (Settings → Folders), browse to a folder in the side panel, and choose **使用当前文件夹** (Use this folder). You can also enter an existing folder's full path. Use **导出到** (Export to) to switch between Chrome downloads and your chosen folder, and **打开文件夹** (Open folder) to locate the current destination. PNGs go directly into the selected folder. Excel and Markdown are grouped by task. To share a Markdown file with its images, save the screenshots first and then export Markdown.
 
 ### Optional source text and media collection
 

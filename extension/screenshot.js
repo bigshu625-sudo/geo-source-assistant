@@ -1,7 +1,7 @@
 import {platformName} from './core.js';
 import {createCaptureReader} from './capture-visible.js';
 let captureBusy=false;
-export const captureBuild='1.4.15';
+export const captureBuild='1.4.16';
 export const captureRunning=()=>captureBusy;
 const readVisibleTab=createCaptureReader((windowId,options)=>chrome.tabs.captureVisibleTab(windowId,options));
 async function verifyActive(tab){const [active]=await chrome.tabs.query({active:true,windowId:tab.windowId});if(active?.id!==tab.id)throw new Error('截图期间切换了标签页，截图已取消。请保持 AI 页面显示后重试。');}

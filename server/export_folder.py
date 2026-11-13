@@ -63,21 +63,41 @@ def task_folder(root, name):
     return folder
 
 
-def save_copy(folder, name, *, data=None, source=None):
-    """Keep existing files intact; an identical copy can be reused."""
+def copy_targets(folder, name):
     base = Path(name)
     if base.name != name or name in ('', '.', '..') or '\\' in name or ':' in name:
         raise ValueError('无效导出文件名')
     for index in range(1, 1000):
-        target = folder / (name if index == 1 else f'{base.stem}-{index:02d}{base.suffix}')
+        yield folder / (name if index == 1 else f'{base.stem}-{index:02d}{base.suffix}')
+    raise ValueError('同名文件太多，请换一个导出文件夹。')
+
+
+def same_copy(target, *, data=None, source=None):
+    if target.is_symlink() or not target.is_file():
+        return False
+    if source is not None:
+        return filecmp.cmp(source, target, shallow=False)
+    return data is not None and target.stat().st_size == len(data) and target.read_bytes() == data
+
+
+def existing_source_copy_name(folder, name, source):
+    """Return the name of a matching exported image, if present."""
+    if not source.is_file():
+        return None
+    for target in copy_targets(folder, name):
+        if not target.exists() and not target.is_symlink():
+            return None
+        if same_copy(target, source=source):
+            return target.name
+
+
+def save_copy(folder, name, *, data=None, source=None):
+    """Keep existing files intact; an identical copy can be reused."""
+    for target in copy_targets(folder, name):
         try:
             handle = target.open('xb')
         except FileExistsError:
-            if target.is_symlink() or not target.is_file():
-                continue
-            if (source is not None and filecmp.cmp(source, target, shallow=False)) or (
-                data is not None and target.stat().st_size == len(data) and target.read_bytes() == data
-            ):
+            if same_copy(target, data=data, source=source):
                 return target
             continue
         try:
@@ -91,4 +111,3 @@ def save_copy(folder, name, *, data=None, source=None):
             target.unlink(missing_ok=True)
             raise
         return target
-    raise ValueError('同名文件太多，请换一个导出文件夹。')

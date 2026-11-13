@@ -1,6 +1,6 @@
 import {safeName,statusLabels,exportFilename,platformName} from './core.js';
 const $=id=>document.getElementById(id);
-const EXPECTED_BUILD='1.4.15';
+const EXPECTED_BUILD='1.4.16';
 let task=null,busy=false,uploadItem=null;
 let refreshRevision=0,renderedTaskSignature='',renderedTaskId=null;
 let library=null,pendingCleanup=null,previewUrls=[],capturing=false;

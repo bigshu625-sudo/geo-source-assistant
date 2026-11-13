@@ -771,7 +771,7 @@ def spreadsheet_payload(task):
     return {'filename':export_filename(task),'headers':expanded,'rows':rows,'contextHeaders':['字段','内容'],'contextRows':context}
 
 
-def markdown_document(task):
+def markdown_document(task, screenshot_export_folder=None):
     # Do not use spreadsheet chunks: Markdown preserves long source text intact.
     lines=['# '+cell_text(task['keyword']), '', '## 搜索信息', '',
            '搜索平台：'+task_platform(task),
@@ -781,13 +781,20 @@ def markdown_document(task):
     if task.get('semanticQueries'):lines.extend(['## 语义分析搜索词','',*[('- '+q) for q in task['semanticQueries']],''])
     lines.extend(['## AI 原回答','',task.get('answer') or '未采集',''])
     if task.get('screenshots'):
-        lines.extend(['## 页面截图','','图片下载到本文档同一目录时，下列相对路径可直接显示。',''])
+        hint = ('已另存的截图使用相对路径，其余图片指向本机资料库。若要一起分享，请先保存截图，再导出 Markdown。' if screenshot_export_folder is not None
+                else '图片下载到本文档同一目录时，下列相对路径可直接显示。')
+        lines.extend(['## 页面截图', '', hint, ''])
         for shot in task['screenshots']:
             label='问答截图' if shot.get('scope')=='question-answer' else '回答截图'
             lines.extend(['截图范围：'+('本轮提问与回答' if shot.get('scope')=='question-answer' else '回答区域'),'截图时间：'+datetime.fromtimestamp(shot['capturedAt'],EXPORT_TZ).strftime('%Y-%m-%d %H:%M:%S'),'来源页面：'+shot['origin'],''])
             if shot.get('question'):lines.extend(['提问：'+shot['question'],''])
             for name in shot['files']:
-                lines.extend([f'![{label}](<{name}>)','本机原图：'+str(task_dir(task['id'])/'screenshots'/shot['id']/name),''])
+                source = task_dir(task['id']) / 'screenshots' / shot['id'] / name
+                image_link = name
+                if screenshot_export_folder is not None:
+                    exported_name = export_folder.existing_source_copy_name(screenshot_export_folder, name, source)
+                    image_link = '../' + exported_name if exported_name else source.as_uri()
+                lines.extend([f'![{label}](<{image_link}>)','本机原图：'+str(source),''])
     for n,item in enumerate(task['items'],1):
         lines.extend([f"## 信源 {n:02d}：{cell_text(item.get('title') or '未取得标题')}",''])
         fields=[('信源编号',item['id']),('类型',item['type']),('处理状态',item['status']),('作者',item.get('author')),('发布时间',item.get('publishedAt')),('原始链接',item.get('originalUrl') or item['url']),('解析链接',item.get('resolvedUrl') or item['url']),('推荐说明',item.get('recommendation')),('正文',item.get('text')),('发布文案',item.get('description')),('视频口播转写',item.get('transcript')),('内容分析',item.get('analysis')),('提示',item.get('warnings')),('分析用量',item.get('analysisUsage')),('转写用量',item.get('transcriptionUsage')),('网页解析记录',item.get('page'))]
@@ -822,13 +829,15 @@ def save_task_exports(task_id, value):
         root = selected_export_folder()
         if value.get('folder') != str(root):
             raise ValueError('导出目录已更改，请重新打开侧栏后再保存。')
-        stem = export_filename(task).removesuffix('.xlsx')
-        folder = export_folder.task_folder(root, f'{stem}-{task_id[:8]}')
+        folder = root
+        if kind != 'screenshots':
+            stem = export_filename(task).removesuffix('.xlsx')
+            folder = export_folder.task_folder(root, f'{stem}-{task_id[:8]}')
         if kind == 'source':
             sources = export_folder.task_folder(folder, '信源素材')
             folder = export_folder.task_folder(sources, item['id'])
         if kind in ('md','xlsx'):
-            data = markdown_document(task) if kind == 'md' else spreadsheet(task)
+            data = markdown_document(task, screenshot_export_folder=root) if kind == 'md' else spreadsheet(task)
             paths = [export_folder.save_copy(folder, export_filename(task,kind), data=data)]
         else:
             paths = []
